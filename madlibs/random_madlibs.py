@@ -2,7 +2,6 @@
 and present to the user. """
 
 import random
-
 from sample_madlibs import code, haunted_house, zombie
 
 x = random.choice([code, haunted_house, zombie])
