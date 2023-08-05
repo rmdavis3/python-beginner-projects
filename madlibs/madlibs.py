@@ -1,5 +1,5 @@
-""" # madlib beginner project
-# https://www.youtube.com/watch?v=8ext9G7xspg&t=100s """
+""" madlib beginner project
+https://www.youtube.com/watch?v=8ext9G7xspg&t=100s """
 
 adjective1 = input("Adjective: ")
 verb1 = input("Verb: ")
