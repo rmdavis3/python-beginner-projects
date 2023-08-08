@@ -42,19 +42,19 @@ def computer_guess():
     """method to begin the computer number guessing game """
     guessed = False
     upper = 1000
-    lower = 0
+    lower = 1
     number = random.randint(lower, upper)
-    print("Think of a number between 0 and 1000!")
+    print("Think of a number between 1 and 1000!")
     print("Let's play!")
     while not guessed:
         hint = input(
             f"Is {number} too high (H), too low (L), or correct (C)??")
         if hint == "H":
             print("Entered H")
-            upper = number
+            upper = number - 1
             number = int((upper+lower)/2)
         elif hint == "L":
-            lower = number
+            lower = number + 1
             number = int((upper+lower)/2)
         elif hint == "C":
             print(f"Yay! The computer guess your number, {number}, correctly!")
