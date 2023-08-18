@@ -11,6 +11,7 @@ def play_game():
 
     print("Welcome to Rock, Papper, Scissors. \nBest 2 out of 3 wins! Let's play!!\n")
 
+    # while loop for best 2 out of 3
     while (player_wins < 2 and computer_wins < 2):
 
         # get a valid user input
