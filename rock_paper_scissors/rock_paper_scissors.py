@@ -67,4 +67,4 @@ def who_won(player, computer):
         return True
 
 
-print(play_game())
+play_game()
