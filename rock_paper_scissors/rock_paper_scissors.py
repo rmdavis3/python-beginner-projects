@@ -8,21 +8,19 @@ def play_game():
     player_wins = 0
     computer_wins = 0
     computer_choices = ['r', 'p', 's']
-    invalid_entry = True
 
     print("Welcome to Rock, Papper, Scissors. \nBest 2 out of 3 wins! Let's play!!\n")
 
     while (player_wins < 2 and computer_wins < 2):
 
         # get a valid user input
-        while (invalid_entry):
+        while (True):
             player = input(
                 "What's your choice? 'r' for rock, 'p' for paper, 's' for scissors: ")
-            if player == 'r' or player == 'p' or player == 's':
-                invalid_entry = False
+            if player in computer_choices:
+                break
 
         computer = random.choice(computer_choices)
-        invalid_entry = True
 
         # check for tie
         if player == computer:
