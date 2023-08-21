@@ -27,9 +27,8 @@ def play_hangman():
     guessed_letters = []
     lives = 6
 
-    # create inital current_word filled with dashes
-    for x in enumerate(word):
-        current_word.append("-")
+    # create inital current_word filled with dashes using a list comprehension
+    current_word = ["-" for letters in enumerate(word)]
 
     # begin game loop
     while lives > 0:
