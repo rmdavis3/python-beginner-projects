@@ -71,6 +71,8 @@ board = [
     ['|', ' '*7, '|', ' '*7, '|', ' '*7, '|'],
     ['+', '-'*7, '+', '-'*7, '+', '-'*7, '+'],]
 
+free_moves = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
 
 def display_board(board):
     """Prints current board"""
@@ -83,32 +85,88 @@ def display_board(board):
 
 def enter_move(board):
     """Updates the board with the player's move"""
-    move = input("Please enter your move: ")
+    move = 0
+    while move not in free_moves:
+        move = input("Please enter your move: ")
     # update the board
     for i, row in enumerate(board):
         for j, column in enumerate(row):
             if move == board[i][j]:
                 board[i][j] = 'o'
+                free_moves[int(move)-1] = 'o'
 
 
 def draw_move(board):
     """Updates the board with the computer's move"""
     # don't implement any form of artificial intelligence − a random
     # field choice made by the computer is good enough for the game.
-    valid = False
-    while not valid:
-        # first get random value for computer's move
+    computer_move = 0
+    while computer_move not in free_moves:
         computer_move = str(randrange(1, 9))
-        print("attempting move", computer_move)
-        for i, row in enumerate(board):
-            for j, column in enumerate(row):
-                if computer_move == board[i][j]:
-                    board[i][j] = 'x'
-                    valid = True
+    print("computer is attempting move", computer_move)
+    for i, row in enumerate(board):
+        for j, column in enumerate(row):
+            if computer_move == board[i][j]:
+                print(i, j)
+                board[i][j] = 'x'
+                free_moves[int(computer_move)-1] = 'x'
+
+
+def check_victory(board):
+    if board[0] == board[1] == board[2] \
+            or board[3] == board[4] == board[5] \
+            or board[6] == board[7] == board[8] \
+            or board[1] == board[4] == board[7] \
+            or board[2] == board[5] == board[8] \
+            or board[3] == board[6] == board[9] \
+            or board[1] == board[5] == board[9] \
+            or board[3] == board[5] == board[7]:
+        return True
+    else:
+        return False
 
 
 display_board(board)
-print(enter_move(board))
+draw_move(board)  # computer turn
+print("victory?", check_victory(free_moves))
 display_board(board)
-draw_move(board)
+
+enter_move(board)  # player turn
+print("victory?", check_victory(free_moves))
 display_board(board)
+
+draw_move(board)  # computer turn
+print("victory?", check_victory(free_moves))
+display_board(board)
+
+enter_move(board)  # player turn
+print("victory?", check_victory(free_moves))
+display_board(board)
+
+draw_move(board)  # computer turn
+print("victory?", check_victory(free_moves))
+display_board(board)
+
+enter_move(board)  # player turn
+print("victory?", check_victory(free_moves))
+display_board(board)
+
+print(free_moves)
+print("victory?", check_victory(free_moves))
+
+
+# def draw_move(board):
+#     """Updates the board with the computer's move"""
+#     # don't implement any form of artificial intelligence − a random
+#     # field choice made by the computer is good enough for the game.
+#     valid = False
+#     while not valid:
+#         # first get random value for computer's move
+#         computer_move = str(randrange(1, 9))
+#         print("attempting move", computer_move)
+#         for i, row in enumerate(board):
+#             for j, column in enumerate(row):
+#                 if computer_move == board[i][j]:
+#                     print(i, j)
+#                     board[i][j] = 'x'
+#                     valid = True
