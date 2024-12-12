@@ -54,8 +54,7 @@ basics of Python programming, such as loops, conditionals, functions, and lists.
 """
 
 from random import randrange
-
-
+import time
 board = [
     ['+', '-'*7, '+', '-'*7, '+', '-'*7, '+'],
     ['|', ' '*7, '|', ' '*7, '|', ' '*7, '|'],
@@ -103,56 +102,92 @@ def draw_move(board):
     computer_move = 0
     while computer_move not in free_moves:
         computer_move = str(randrange(1, 9))
-    print("computer is attempting move", computer_move)
+    print("computer is attempting to move to position", computer_move)
     for i, row in enumerate(board):
         for j, column in enumerate(row):
             if computer_move == board[i][j]:
-                print(i, j)
                 board[i][j] = 'x'
                 free_moves[int(computer_move)-1] = 'x'
 
 
 def check_victory(board):
+    """Returns true if 3 in a row or stalemate"""
     if board[0] == board[1] == board[2] \
             or board[3] == board[4] == board[5] \
             or board[6] == board[7] == board[8] \
+            or board[0] == board[3] == board[6] \
             or board[1] == board[4] == board[7] \
             or board[2] == board[5] == board[8] \
-            or board[3] == board[6] == board[9] \
-            or board[1] == board[5] == board[9] \
-            or board[3] == board[5] == board[7]:
+            or board[0] == board[4] == board[8] \
+            or board[2] == board[4] == board[6]:
         return True
-    else:
-        return False
+    elif:
+        for num in range(1, 10):
+            if str(num) in board:
+                return False
+    return True
 
 
-display_board(board)
-draw_move(board)  # computer turn
-print("victory?", check_victory(free_moves))
-display_board(board)
+###################################################################################################
 
-enter_move(board)  # player turn
-print("victory?", check_victory(free_moves))
-display_board(board)
+# temp = ['x', 'o', 'x', 'o', 'x', 'x', 'o', 'x', 'o']
+# print(temp)
+# for num in range(1, 10):
+#     print("hi", type(num))
+#     if str(num) in temp:
+#         print(temp)
+#         print(num, "is in temp")
 
-draw_move(board)  # computer turn
-print("victory?", check_victory(free_moves))
-display_board(board)
 
-enter_move(board)  # player turn
-print("victory?", check_victory(free_moves))
-display_board(board)
+print("Welcome to my Tic Tac Toe game!")
+time.sleep(1.5)
+print("The computer will be x's and you will be o's.")
+time.sleep(1.5)
+print("The computer will go first!")
+time.sleep(1.5)
+print("LET'S BEGIN!")
 
-draw_move(board)  # computer turn
-print("victory?", check_victory(free_moves))
-display_board(board)
+while not check_victory(free_moves):
+    draw_move(board)  # computer turn
+    time.sleep(3)
+    display_board(board)
+    print(free_moves)
+    print("-"*50)
+    enter_move(board)  # player turn
+    display_board(board)
+    time.sleep(2)
+    print(free_moves)
+    print("-"*50)
 
-enter_move(board)  # player turn
-print("victory?", check_victory(free_moves))
-display_board(board)
+print("GAME OVER")
 
-print(free_moves)
-print("victory?", check_victory(free_moves))
+# display_board(board)
+# draw_move(board)  # computer turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# enter_move(board)  # player turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# draw_move(board)  # computer turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# enter_move(board)  # player turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# draw_move(board)  # computer turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# enter_move(board)  # player turn
+# print("victory?", check_victory(free_moves))
+# display_board(board)
+
+# print(free_moves)
+# print("victory?", check_victory(free_moves))
 
 
 # def draw_move(board):
