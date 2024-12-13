@@ -55,6 +55,10 @@ basics of Python programming, such as loops, conditionals, functions, and lists.
 
 from random import randrange
 import time
+
+
+free_moves = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
 board = [
     ['+', '-'*7, '+', '-'*7, '+', '-'*7, '+'],
     ['|', ' '*7, '|', ' '*7, '|', ' '*7, '|'],
@@ -70,8 +74,6 @@ board = [
     ['|', ' '*7, '|', ' '*7, '|', ' '*7, '|'],
     ['+', '-'*7, '+', '-'*7, '+', '-'*7, '+'],]
 
-free_moves = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-
 
 def display_board(board):
     """Prints current board"""
@@ -83,35 +85,38 @@ def display_board(board):
 
 
 def enter_move(board):
-    """Updates the board with the player's move"""
+    """Updates the board with the player's move and the list of free moves"""
     move = 0
     while move not in free_moves:
         move = input("Please enter your move: ")
-    # update the board
+        if move not in free_moves:
+            print("Invalid move attempt")
+    # place the player's move on the board
     for i, row in enumerate(board):
         for j, column in enumerate(row):
             if move == board[i][j]:
-                board[i][j] = 'o'
-                free_moves[int(move)-1] = 'o'
+                board[i][j] = 'O'
+                free_moves[int(move)-1] = 'O'
 
 
 def draw_move(board):
-    """Updates the board with the computer's move"""
+    """Updates the board with the computer's move and the list of free moves"""
     # don't implement any form of artificial intelligence − a random
     # field choice made by the computer is good enough for the game.
     computer_move = 0
     while computer_move not in free_moves:
-        computer_move = str(randrange(1, 9))
+        computer_move = str(randrange(1, 10))
     print("computer is attempting to move to position", computer_move)
     for i, row in enumerate(board):
         for j, column in enumerate(row):
             if computer_move == board[i][j]:
-                board[i][j] = 'x'
-                free_moves[int(computer_move)-1] = 'x'
+                board[i][j] = 'X'
+                free_moves[int(computer_move)-1] = 'X'
 
 
 def check_victory(board):
     """Returns true if 3 in a row or stalemate"""
+    print("checking for victory")
     if board[0] == board[1] == board[2] \
             or board[3] == board[4] == board[5] \
             or board[6] == board[7] == board[8] \
@@ -120,11 +125,14 @@ def check_victory(board):
             or board[2] == board[5] == board[8] \
             or board[0] == board[4] == board[8] \
             or board[2] == board[4] == board[6]:
+        print("Congrats, there's 3 in a row!")
         return True
-    elif:
-        for num in range(1, 10):
-            if str(num) in board:
-                return False
+    for num in range(1, 10):
+        if str(num) in board:
+            print("checking for if any valid moves are left, at least postion",
+                  num, "is left")
+            return False
+    print("STALEMATE!")
     return True
 
 
@@ -140,24 +148,28 @@ def check_victory(board):
 
 
 print("Welcome to my Tic Tac Toe game!")
-time.sleep(1.5)
-print("The computer will be x's and you will be o's.")
-time.sleep(1.5)
+time.sleep(1)
+print("The computer will be X's and you will be O's.")
+time.sleep(1)
 print("The computer will go first!")
-time.sleep(1.5)
+time.sleep(1)
 print("LET'S BEGIN!")
 
-while not check_victory(free_moves):
+while True:
     draw_move(board)  # computer turn
     time.sleep(3)
     display_board(board)
+    if check_victory(free_moves):
+        break
     print(free_moves)
-    print("-"*50)
+    print("\n", "\n", "\n", "-"*50)
     enter_move(board)  # player turn
     display_board(board)
+    if check_victory(free_moves):
+        break
     time.sleep(2)
     print(free_moves)
-    print("-"*50)
+    print("\n", "\n", "\n", "-"*50)
 
 print("GAME OVER")
 
