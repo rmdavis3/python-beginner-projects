@@ -118,22 +118,32 @@ def draw_move(board):
                 board[i][j] = 'X'
                 # update the list of free available moves
                 free_moves[int(computer_move)-1] = 'X'
-                print(f"Computer moved to postion {computer_move}")
+                print(f"Computer moved to postion: {computer_move}")
 
 
 def check_victory(board):
     """Returns true if 3 in a row or stalemate"""
-    if board[0] == board[1] == board[2] \
-            or board[3] == board[4] == board[5] \
-            or board[6] == board[7] == board[8] \
-            or board[0] == board[3] == board[6] \
-            or board[1] == board[4] == board[7] \
-            or board[2] == board[5] == board[8] \
-            or board[0] == board[4] == board[8] \
-            or board[2] == board[4] == board[6]:
-        print("Congrats, there's 3 in a row!")
+    if board[0] == board[1] == board[2] == 'O'\
+            or board[3] == board[4] == board[5] == 'O' \
+            or board[6] == board[7] == board[8] == 'O' \
+            or board[0] == board[3] == board[6] == 'O' \
+            or board[1] == board[4] == board[7] == 'O' \
+            or board[2] == board[5] == board[8] == 'O' \
+            or board[0] == board[4] == board[8] == 'O' \
+            or board[2] == board[4] == board[6] == 'O':
+        print("CONGRATULATIONS, YOU GOT 3 IN A ROW, YOU WIN!!!")
         return True
-    # checks for stalemate condition
+    if board[0] == board[1] == board[2] == 'X'\
+            or board[3] == board[4] == board[5] == 'X' \
+            or board[6] == board[7] == board[8] == 'X' \
+            or board[0] == board[3] == board[6] == 'X' \
+            or board[1] == board[4] == board[7] == 'X' \
+            or board[2] == board[5] == board[8] == 'X' \
+            or board[0] == board[4] == board[8] == 'X' \
+            or board[2] == board[4] == board[6] == 'X':
+        print("BETTER LUCK NEXT TIME, THE COMPUTER GOT 3 IN A ROW!!!")
+        return True
+    # checks for not stalemate condition
     for num in range(1, 10):
         if str(num) in board:
             return False
@@ -154,7 +164,6 @@ print("LET'S BEGIN!")
 
 while True:
     draw_move(board)  # computer turn
-    time.sleep(1)
     display_board(board)
     if check_victory(free_moves):
         break
