@@ -19,17 +19,13 @@ headers = {
     "Authorization": f"Bearer {token}"
 }
 
-BUDGET = "Davis Family"
 
-
-# 1. get_budgets():
-#     * Fetch all budgets and return them as a list.
-#     * Optionally, let the user select one by name or ID.
 def get_budgets():
     """Fetch all budget and return them as a list."""
     budget_list = []
     # Fetch the budgets
-    budgets_response = requests.get(f"{BASE_URL}/budgets", headers=headers)
+    budgets_response = requests.get(
+        f"{BASE_URL}/budgets", headers=headers, timeout=10)
     if budgets_response.status_code == 200:
         budgets = budgets_response.json()["data"]["budgets"]
         # Append budgets to list
@@ -42,27 +38,31 @@ def get_budgets():
         print(budgets_response.text)
 
 
-# # Fetch the budgets
-# budgets_response = requests.get(f"{base_url}/budgets", headers=headers)
-# if budgets_response.status_code == 200:
-#     budgets = budgets_response.json()["data"]["budgets"]
+# 2. get_categories(budget_id):
+#     * Fetch category groups for the selected budget.
+#     * Store the categories in a dictionary for easy lookups(e.g., category_id -> category_name).
 
-#     # Loop through each budget
-#     for budget in budgets:
-#         budget_id = budget["id"]
-#         budget_name = budget["name"]
-#         print(f"Budget: {budget_name}")
+# 3. get_transactions(budget_id, month):
+#     * Fetch all transactions for the specified month and budget.
 
-#         # Fetch accounts for the budget
-#         accounts_response = requests.get(
-#             f"{base_url}/budgets/{budget_id}/accounts", headers=headers)
-#         if accounts_response.status_code == 200:
-#             accounts = accounts_response.json()["data"]["accounts"]
-#             for account in accounts:
-#                 print(f"\tAccount: {account['name']}")
-#         else:
-#             print(f"\tCould not fetch accounts for budget {budget_name}")
-# else:
-#     print("Failed to fetch budgets")
+# 4. calculate_spending(transactions, categories):
+#     * Group the transactions by category and calculate total spending per category.
 
-print(get_budgets())
+# 5. display_summary(summary):
+#     * Format and print the spending summary.
+
+
+# Main program flow
+
+budgets = get_budgets()
+
+if budgets:
+    print("Which budget would you like to see a monthly summary for?\n")
+    for index, budget in enumerate(budgets):
+        print(f"Enter {index+1} for '{budget}' budget.")
+    user_input = int(input())
+    print("you chose", user_input)
+    budget_id = budgets[user_input-1]
+    print("ID is,", budget_id)
+else:
+    print("No budgets available.")
