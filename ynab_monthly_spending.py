@@ -18,10 +18,6 @@ headers = {
     "Authorization": f"Bearer {token}"
 }
 
-# 2. get_categories(budget_id):
-#     * Fetch category groups for the selected budget.
-#     * Store the categories in a dictionary for easy lookups(e.g., category_id -> category_name).
-
 # 3. get_transactions(budget_id, month):
 #     * Fetch all transactions for the specified month and budget.
 
@@ -51,22 +47,11 @@ def get_budgets():
     return budget_dict
 
 
-def display_budgets():
+def display_budgets(budget_list):
     """Display all available budgets"""
-    # Convert the dictionary to a list of tuples (budget_id, budget_name)
-    budget_list = list(budget_dict.items())
-
     # Display the options with indexes
     for index, (_, budget_name) in enumerate(budget_list):
         print(f"{index+1}. {budget_name.upper()}")
-
-    choice = get_valid_user_choice(budget_list)
-
-    # Retrieve the selected budget using the chosen index
-    selected_budget = budget_list[choice-1]
-
-    selected_budget_id, _ = selected_budget
-    print("ID is,", selected_budget_id)
 
 
 def get_valid_user_choice(budget_list):
@@ -79,15 +64,79 @@ def get_valid_user_choice(budget_list):
             print(f"Please enter a number between 1 and {len(budget_list)}.")
 
 
-# Main program flow
-budget_dict = get_budgets()
+def get_budget_id(budget_list, choice):
+    # Retrieve the selected budget using the chosen index
+    selected_budget = budget_list[choice-1]
 
-if budget_dict:
-
-    print("Which budget would you like to see a monthly summary for?\n")
-    display_budgets()
-    # budget_id = get_budget_id()
+    selected_budget_id, _ = selected_budget
+    return selected_budget_id
 
 
-else:
-    print("No budgets available.")
+def get_categories(budget_id):
+    """Fetch category groups for the selected budget and store them in a dictionary for easy lookups."""
+    category_dict = {}
+    # Fetch the categories for the given budget_id
+    categories_response = requests.get(
+        f"{BASE_URL}/budgets/{budget_id}/categories", headers=headers, timeout=10)
+
+    if categories_response.status_code == 200:
+        categories_data = categories_response.json()["data"]["category_groups"]
+
+        # Remove categories where 'hidden' is True
+        filtered_categories_data = [
+            category for category in categories_data if not category.get('hidden', False)]
+
+        # Print the filtered data with indentation for clarity
+        print(json.dumps(filtered_categories_data, indent=4))
+
+        # Iterate over each category group and its categories
+        for category_group in categories_data:
+            for category in category_group["categories"]:
+                category_dict[category['id']] = category['name']
+        return category_dict
+    else:
+        print(f"Failed to fetch budgets. Status Code: {
+              categories_response.status_code}")
+        print(categories_response.text)
+    return category_dict
+
+
+### Main program flow ###
+def main():
+    """
+    Main program flow to interact with YNAB API and allow the user to select a budget.
+
+    This function fetches all available budgets using the `get_budgets()` function,
+    displays the budgets to the user with options to select a budget, and then retrieves
+    the selected budget's ID. If no budgets are available, an appropriate message is shown.
+
+    It calls the following functions:
+    - `get_budgets()`: Fetches and returns the available budgets.
+    - `display_budgets()`: Displays the available budgets to the user.
+    - `get_valid_user_choice()`: Prompts the user to select a budget.
+    - `get_budget_id()`: Retrieves the ID of the selected budget based on user input.
+    """
+
+    budget_dict = get_budgets()  # Fetch the budget data
+
+    # Convert dictionary to list of tuples
+    budget_list = list(budget_dict.items())
+
+    if budget_dict:  # Ensure there are budgets available
+        print("Which budget would you like to see a monthly summary for?\n")
+
+        display_budgets(budget_list)  # Display the budgets
+
+        choice = get_valid_user_choice(budget_list)  # Get valid user input
+
+        selected_budget_id = get_budget_id(
+            budget_list, choice)  # Get the budget ID
+
+        get_categories(selected_budget_id)
+
+    else:
+        print("No budgets available.")
+
+
+if __name__ == "__main__":
+    main()
