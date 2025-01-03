@@ -12,31 +12,11 @@ if token:
 else:
     print("Error: YNAB_API_TOKEN environment variable is not set.")
 
-
 # Set the base URL and headers
 BASE_URL = "https://api.ynab.com/v1"
 headers = {
     "Authorization": f"Bearer {token}"
 }
-
-
-def get_budgets():
-    """Fetch all budget and return them as a list."""
-    budget_list = []
-    # Fetch the budgets
-    budgets_response = requests.get(
-        f"{BASE_URL}/budgets", headers=headers, timeout=10)
-    if budgets_response.status_code == 200:
-        budgets = budgets_response.json()["data"]["budgets"]
-        # Append budgets to list
-        for budget in budgets:
-            budget_list.append(budget['name'])
-        return budget_list
-    else:
-        print(f"Failed to fetch budgets. Status Code: {
-              budgets_response.status_code}")
-        print(budgets_response.text)
-
 
 # 2. get_categories(budget_id):
 #     * Fetch category groups for the selected budget.
@@ -52,17 +32,62 @@ def get_budgets():
 #     * Format and print the spending summary.
 
 
+def get_budgets():
+    """Fetch all budget and return them as a list."""
+    budget_dict = {}
+    # Fetch the budgets
+    budgets_response = requests.get(
+        f"{BASE_URL}/budgets", headers=headers, timeout=10)
+    if budgets_response.status_code == 200:
+        budgets = budgets_response.json()["data"]["budgets"]
+        # Add budgets and their ids to a new simplified dictionary
+        for budget in budgets:
+            budget_dict[budget['id']] = budget['name']
+        return budget_dict
+    else:
+        print(f"Failed to fetch budgets. Status Code: {
+              budgets_response.status_code}")
+        print(budgets_response.text)
+    return budget_dict
+
+
+def display_budgets():
+    """Display all available budgets"""
+    # Convert the dictionary to a list of tuples (budget_id, budget_name)
+    budget_list = list(budget_dict.items())
+
+    # Display the options with indexes
+    for index, (_, budget_name) in enumerate(budget_list):
+        print(f"{index+1}. {budget_name.upper()}")
+
+    choice = get_valid_user_choice(budget_list)
+
+    # Retrieve the selected budget using the chosen index
+    selected_budget = budget_list[choice-1]
+
+    selected_budget_id, _ = selected_budget
+    print("ID is,", selected_budget_id)
+
+
+def get_valid_user_choice(budget_list):
+    """Return the user's choice"""
+    while True:
+        user_input = int(input("Enter the number of your choice: "))
+        if 1 <= user_input <= len(budget_list):
+            return user_input
+        else:
+            print(f"Please enter a number between 1 and {len(budget_list)}.")
+
+
 # Main program flow
+budget_dict = get_budgets()
 
-budgets = get_budgets()
+if budget_dict:
 
-if budgets:
     print("Which budget would you like to see a monthly summary for?\n")
-    for index, budget in enumerate(budgets):
-        print(f"Enter {index+1} for '{budget}' budget.")
-    user_input = int(input())
-    print("you chose", user_input)
-    budget_id = budgets[user_input-1]
-    print("ID is,", budget_id)
+    display_budgets()
+    # budget_id = get_budget_id()
+
+
 else:
     print("No budgets available.")
