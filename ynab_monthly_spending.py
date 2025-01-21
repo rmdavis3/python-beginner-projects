@@ -18,9 +18,6 @@ headers = {
     "Authorization": f"Bearer {token}"
 }
 
-# 3. get_transactions(budget_id, month):
-#     * Fetch all transactions for the specified month and budget.
-
 # 4. calculate_spending(transactions, categories):
 #     * Group the transactions by category and calculate total spending per category.
 
@@ -29,22 +26,33 @@ headers = {
 
 
 def get_budgets():
-    """Fetch all budget and return them as a list."""
-    budget_dict = {}
-    # Fetch the budgets
-    budgets_response = requests.get(
-        f"{BASE_URL}/budgets", headers=headers, timeout=10)
+    """
+    Processes the budgets response to return a dictionary of budget IDs and names.
+    """
+
+    budgets_response = fetch_budgets_response()
+
     if budgets_response.status_code == 200:
-        budgets = budgets_response.json()["data"]["budgets"]
+        budget_dict = {}
+        budgets_data = budgets_response.json()["data"]["budgets"]
+
         # Add budgets and their ids to a new simplified dictionary
-        for budget in budgets:
+        for budget in budgets_data:
             budget_dict[budget['id']] = budget['name']
+
         return budget_dict
     else:
         print(f"Failed to fetch budgets. Status Code: {
               budgets_response.status_code}")
         print(budgets_response.text)
-    return budget_dict
+    return {}
+
+
+def fetch_budgets_response():
+    """
+    Fetch the budgets from the API. Returns the response object.
+    """
+    return requests.get(f"{BASE_URL}/budgets", headers=headers, timeout=10)
 
 
 def display_budgets(budget_list):
@@ -65,6 +73,15 @@ def get_valid_user_choice(budget_list):
 
 
 def get_budget_id(budget_list, choice):
+    """
+    Retrieve the budget ID for the user's selected budget.
+    Parameters:
+    - budget_list (list): A list of tuples containing budget IDs and names.
+    - choice (int): The user's selection (1-based index) for the budget.
+    Returns:
+    - str: The budget ID corresponding to the user's choice.
+    """
+
     # Retrieve the selected budget using the chosen index
     selected_budget = budget_list[choice-1]
 
@@ -72,36 +89,114 @@ def get_budget_id(budget_list, choice):
     return selected_budget_id
 
 
-def get_categories(budget_id):
-    """Fetch category groups for the selected budget and store them in a dictionary for easy lookups."""
-    category_dict = {}
+def get_filtered_categories(budget_id):
+    """
+    This function filters out hidden category groups and hidden categories
+    from the response, returning a dictionary where each category group
+    id maps to another dictionary of categories.
+    """
+
     # Fetch the categories for the given budget_id
-    categories_response = requests.get(
-        f"{BASE_URL}/budgets/{budget_id}/categories", headers=headers, timeout=10)
+    categories_response = fetch_categories_response(budget_id)
 
     if categories_response.status_code == 200:
         categories_data = categories_response.json()["data"]["category_groups"]
 
-        # Remove categories where 'hidden' is True
-        filtered_categories_data = [
-            category for category in categories_data if not category.get('hidden', False)]
+        print(json.dumps(categories_data[0:2], indent=4))
 
-        # Print the filtered data with indentation for clarity
-        print(json.dumps(filtered_categories_data, indent=4))
+        filtered_categories_dict = {}
 
-        # Iterate over each category group and its categories
+        # Iterate through the group categories
         for category_group in categories_data:
-            for category in category_group["categories"]:
-                category_dict[category['id']] = category['name']
-        return category_dict
+            # Skip the category group if it's hidden or an Internal Master Category
+            if category_group.get('hidden') or category_group['name'] == 'Internal Master Category':
+                continue
+
+            # If category group is not hidden, filter the categories inside it
+            filtered_categories = {}
+
+            for category in category_group['categories']:
+                # Skip the category group if it's hidden
+                if category.get('hidden'):
+                    continue
+
+                filtered_categories_dict[category_group['id']] = {
+                    'group_name': category_group['name'],
+                }
+
+                # print("category_group:",
+                #       category_group['name'], "--", category['name'], "-", category['id'])
+
+                # Add the category to the filtered_categories dictionary
+                filtered_categories[category["id"]] = {
+                    "name": category["name"],
+                }
+            # Only add to the main dictionary if there are valid categories
+            if filtered_categories:
+                filtered_categories_dict[category_group['name']
+                                         ] = filtered_categories
+
+        # print(json.dumps(filtered_categories_dict, indent=4))
+
+        return filtered_categories_dict
     else:
-        print(f"Failed to fetch budgets. Status Code: {
+        print(f"Failed to fetch categories. Status Code: {
               categories_response.status_code}")
         print(categories_response.text)
-    return category_dict
+    return {}
 
 
-### Main program flow ###
+def fetch_categories_response(budget_id):
+    """
+    Fetch the categories from the API. Returns the response object.
+    """
+    return requests.get(f"{BASE_URL}/budgets/{budget_id}/categories", headers=headers, timeout=10)
+
+
+def get_monthly_transactions(budget_id, month='current'):
+    """
+    Fetch all transactions for the specified month and budget.
+    """
+    # Fetch the transactions for the given budget_id
+    transactions_response = fetch_monthly_transactions_response(budget_id)
+
+    if transactions_response.status_code == 200:
+        transactions_dict = {}
+        transactions_data = transactions_response.json()[
+            "data"]["transactions"]
+
+        # print(json.dumps(transactions_data[:], indent=4))
+
+        # For each transaction id, add a dictionary of values
+        for transaction in transactions_data:
+            # Transfer transactions have an extra null transaction, so filter out null transactions
+            if not transaction['category_id']:
+                continue
+            transactions_dict[transaction['id']] = {
+                'amount': transaction['amount'],
+                'category_id': transaction['category_id'],
+                'category_name': transaction['category_name'],
+            }
+
+        # print(json.dumps(transactions_dict, indent=4))
+
+        return transactions_dict
+    else:
+        print(f"Failed to fetch budgets. Status Code: {
+              transactions_response.status_code}")
+        print(transactions_response.text)
+    return {}
+
+
+def fetch_monthly_transactions_response(budget_id, month='current'):
+    """
+    Fetch the transactions for the specified month from the API.
+    """
+    return requests.get(f"{BASE_URL}/budgets/{budget_id}/months/{month}/transactions", headers=headers, timeout=10)
+
+    ### Main program flow ###
+
+
 def main():
     """
     Main program flow to interact with YNAB API and allow the user to select a budget.
@@ -125,14 +220,23 @@ def main():
     if budget_dict:  # Ensure there are budgets available
         print("Which budget would you like to see a monthly summary for?\n")
 
-        display_budgets(budget_list)  # Display the budgets
+        # Display the budgets
+        display_budgets(budget_list)
 
-        choice = get_valid_user_choice(budget_list)  # Get valid user input
+        # Get valid user choice
+        choice = get_valid_user_choice(budget_list)
 
-        selected_budget_id = get_budget_id(
-            budget_list, choice)  # Get the budget ID
+        # Get the budget ID
+        selected_budget_id = get_budget_id(budget_list, choice)
 
-        get_categories(selected_budget_id)
+        print(f"\nYou selected the budget: {
+              budget_dict[selected_budget_id].upper()}\n")
+
+        print("Fetching categories...\n")
+
+        get_filtered_categories(selected_budget_id)
+
+        get_monthly_transactions(selected_budget_id)
 
     else:
         print("No budgets available.")
