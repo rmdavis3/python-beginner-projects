@@ -1,5 +1,4 @@
 
-
 def bubble_sort(list):
     total_swaps = 0
     for i, _ in enumerate(list):
