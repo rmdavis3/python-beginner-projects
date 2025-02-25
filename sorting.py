@@ -53,14 +53,23 @@ def insertion_sort(array):
     """
     Sorts a list using the Insertion Sort algorithm.
     """
+    shift_count = 0  # Count actual shifts
     for i in range(1, len(array)):
         temp_value = array[i]
-        for j in range(i-1, -1, -1):
-            if array[j] > temp_value:
-                array[j+1] = array[j]
-            else:
-                array[j] = temp_value
+        position = i - 1
+
+        # Shift elements to the right only if necessary
+        while position >= 0 and array[position] > temp_value:
+            array[position + 1] = array[position]  # Shift right
+            position -= 1  # Move left
+            shift_count += 1  # Count the shift
+
+        # Insert temp_value in the correct position
+        array[position + 1] = temp_value
         print(array)
+
+    print(f"Insertion Sort took {shift_count} shifts.")
+    return array
 
 
 def main():
