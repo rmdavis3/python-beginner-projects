@@ -49,14 +49,24 @@ def binary_search_sorted_array(sorted_array, search_value):
     return f"I did not find your value {search_value} in the array."
 
 
-print(linear_search_sorted_array([3, 17, 22, 75, 80, 202], 22))  # Found case
-print(linear_search_sorted_array(
-    [3, 17, 22, 75, 80, 202], 24))  # Not found case
+def main():
+    """Main Program Flow"""
+
+    print("Linear Search:")
+    print(linear_search_sorted_array(
+        [3, 17, 22, 75, 80, 202], 22))  # Found case
+
+    print(linear_search_sorted_array(
+        [3, 17, 22, 75, 80, 202], 24))  # Not found case
+
+    print()
+
+    print("Binary Search:")
+    print(binary_search_sorted_array(
+        [3, 17, 22, 75, 80, 202], 22))  # Found case
+    print(binary_search_sorted_array(
+        [3, 17, 22, 75, 80, 202], 24))  # Not found case
 
 
-print()
-
-
-print(binary_search_sorted_array([3, 17, 22, 75, 80, 202], 22))  # Found case
-print(binary_search_sorted_array(
-    [3, 17, 22, 75, 80, 202], 24))  # Not found case
+if __name__ == "__main__":
+    main()
