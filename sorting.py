@@ -98,7 +98,7 @@ def main():
     print()
 
     # Test Selection Sort
-    print("Testing Selection Sort:")
+    print("Testing Insertion Sort:")
     print(f"Original Array: {unsorted_array}")
     # Create a copy to preserve the original array
     insertion_sorted_array = unsorted_array.copy()
